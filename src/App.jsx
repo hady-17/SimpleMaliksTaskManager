@@ -77,7 +77,14 @@ export default function App() {
           </div>
 
           {/* Task list */}
-          <TaskList tasks={filtered} newestId={newestId} onToggle={toggleDone} onDelete={deleteTask} />
+          <TaskList
+            tasks={filtered}
+            totalCount={tasks.length}
+            filter={filter}
+            newestId={newestId}
+            onToggle={toggleDone}
+            onDelete={deleteTask}
+          />
         </div>
       </div>
     </div>
