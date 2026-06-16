@@ -16,3 +16,5 @@ Add drag-and-drop reordering so users can manually arrange tasks within the same
 ## Plan My Day — implementation note
 
 "Plan My Day" uses a pure JS sort (High → Medium → Low). No external API or AI dependency — simple, reliable, and instant. An API-based version was considered but ruled out: the value add is low for a single-day planner and would introduce network failure modes.
+
+Deployment Link: https://simple-maliks-task-manager.vercel.app

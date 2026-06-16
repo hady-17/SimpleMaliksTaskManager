@@ -2,6 +2,10 @@
 
 A lightweight task management app built with React, Vite, and Tailwind CSS.
 
+## Live Demo
+
+https://simple-maliks-task-manager.vercel.app
+
 ## Features
 
 - **Add tasks** with a title and priority level (High / Medium / Low)
