@@ -46,11 +46,17 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
+  // "Plan My Day": order the unfinished tasks by priority and float them to the
+  // top; completed tasks keep their relative order and sit below.
   function sortTasks() {
     const ORDER = { High: 0, Medium: 1, Low: 2 };
-    setTasks((prev) =>
-      [...prev].sort((a, b) => ORDER[a.priority] - ORDER[b.priority])
-    );
+    setTasks((prev) => {
+      const pending = prev
+        .filter((t) => !t.done)
+        .sort((a, b) => ORDER[a.priority] - ORDER[b.priority]);
+      const done = prev.filter((t) => t.done);
+      return [...pending, ...done];
+    });
   }
 
   return { tasks, newestId, addTask, toggleDone, deleteTask, sortTasks };
