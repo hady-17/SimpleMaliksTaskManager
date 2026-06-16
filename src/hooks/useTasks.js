@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'task-planner-tasks';
 
+// Generates a collision-free task id. Date.now() alone repeats when several
+// tasks are created in the same millisecond, so prefer crypto.randomUUID().
+function createId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 // Loads tasks from localStorage. If there is an error or no tasks are found, it returns an empty array.
 function loadFromStorage() {
   try {
@@ -25,7 +34,7 @@ export function useTasks() {
 
   function addTask(title, priority, description = '') {
     const newTask = {
-      id: String(Date.now()),
+      id: createId(),
       title: title.trim(),
       description: description.trim(),
       priority,
