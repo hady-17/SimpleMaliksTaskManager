@@ -9,6 +9,10 @@ https://simple-maliks-task-manager.vercel.app
 ## Features
 
 - **Add tasks** with a title and priority level (High / Medium / Low)
+- **Schedule tasks by day** — pick a date when adding a task (defaults to the day you're currently viewing, e.g. keep it for today or set it for `12/4/2026`)
+- **Browse days** — a date navigator steps backward/forward a day, jumps to any date via a picker, or snaps back to **Today**; each day shows only that day's tasks
+- **Reschedule tasks** — click the 📅 date on any task to move it to another day
+- **Late-task reminder** — a footer note counts tasks that are past their date and still not done, and clicking it jumps to the oldest overdue day so you can complete or reschedule them
 - **Optional description** — expandable via a "Description" toggle on the add form, shown beneath the task title
 - **Voice input** — dictate a task with the 🎤 mic (browser Web Speech API)
   - **English & Arabic** — an EN / AR toggle switches the dictation language; Arabic uses the Lebanese locale (`ar-LB`)
@@ -31,12 +35,36 @@ https://simple-maliks-task-manager.vercel.app
 
 ## Getting Started
 
+### Prerequisites
+
+- [Node.js](https://nodejs.org) 18 or newer (includes `npm`)
+
+### Run it locally (cloned from GitHub)
+
 ```bash
+# 1. Clone the repository
+git clone <your-repo-url>
+
+# 2. Enter the project folder
+cd task-planner
+
+# 3. Install dependencies
 npm install
+
+# 4. Start the development server
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Then open the URL printed in the terminal — by default [http://localhost:5173](http://localhost:5173) — in your browser.
+
+> If the repository was cloned into a different folder name, `cd` into that folder instead. The app runs entirely in the browser with no backend or environment variables to configure.
+
+### Production build
+
+```bash
+npm run build    # outputs to dist/
+npm run preview  # serve the built app locally
+```
 
 ## Testing
 
@@ -52,17 +80,19 @@ npm run test:watch # re-run on change
 ```
 src/
 ├── components/
-│   ├── TaskForm.jsx          # Add-task input, priority, description toggle, voice input
+│   ├── TaskForm.jsx          # Add-task input, date, priority, description toggle, voice input
 │   ├── TaskList.jsx          # Renders the filtered list, picks the empty-state message
-│   ├── TaskItem.jsx          # Individual task row with toggle/delete and description
+│   ├── TaskItem.jsx          # Individual task row with toggle/delete, description, reschedule
+│   ├── DateNavigator.jsx     # Day picker: prev/next day, jump-to-date, "Today"
 │   ├── PlanMyDayButton.jsx   # Triggers the priority sort
 │   ├── ConfirmDialog.jsx     # Delete confirmation modal
 │   └── EmptyState.jsx        # Empty-state message (filter-aware)
 ├── hooks/
-│   ├── useTasks.js           # Task state, unique IDs, localStorage persistence, sorting
+│   ├── useTasks.js           # Task state, unique IDs, localStorage persistence, sorting, rescheduling
 │   └── useSpeechRecognition.js # Web Speech API wrapper (single-utterance dictation)
 ├── utils/
 │   ├── sortByPriority.js     # Priority sort helper
+│   ├── date.js               # Local-safe date helpers (today, add days, formatting, overdue check)
 │   └── translateToEnglish.js # Arabic → English translation (MyMemory API)
 ├── test/
 │   ├── setup.js              # jest-dom matchers
@@ -70,7 +100,7 @@ src/
 │   ├── translateToEnglish.test.js
 │   ├── useTasks.test.js
 │   └── TaskList.test.jsx
-└── App.jsx                   # Root layout, filter state, dark mode
+└── App.jsx                   # Root layout, filter + selected-day state, dark mode, overdue footer
 ```
 
 ## Notes & Limitations
@@ -88,3 +118,7 @@ src/
 | `npm run lint` | Run ESLint |
 | `npm test` | Run unit tests once |
 | `npm run test:watch` | Run unit tests in watch mode |
+
+
+## Deployment link 
+  https://simple-maliks-task-manager.vercel.app/
