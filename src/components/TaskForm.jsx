@@ -46,7 +46,7 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-2 p-4 bg-white rounded-xl shadow-sm border border-gray-100"
+      className="flex flex-col gap-2 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700"
     >
       <div className="relative">
         <input
@@ -54,7 +54,7 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={listening ? 'Listening…' : 'Add a new task…'}
-          className="w-full px-3 py-2.5 pr-16 rounded-lg border border-gray-200 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="w-full px-3 py-2.5 pr-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-base text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
         {supported && (
           <button
@@ -98,12 +98,12 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
           onChange={(e) => setDate(e.target.value)}
           title="Task date"
           aria-label="Task date"
-          className="px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-sm bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
         >
           <option value="High">High</option>
           <option value="Medium">Medium</option>
@@ -113,7 +113,7 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
           type="button"
           onClick={() => setOpen((o) => !o)}
           title={open ? 'Hide description' : 'Add description'}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors text-sm whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors text-sm whitespace-nowrap"
         >
           <span className="text-xs font-medium">Description</span>
           <svg
@@ -151,7 +151,7 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
           placeholder="Description (optional)…"
           rows={2}
           autoFocus
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
         />
       )}
     </form>

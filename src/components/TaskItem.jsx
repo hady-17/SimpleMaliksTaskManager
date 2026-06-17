@@ -3,16 +3,20 @@ import ConfirmDialog from './ConfirmDialog';
 import { formatShort, isOverdue } from '../utils/date';
 
 const PRIORITY_STYLES = {
-  High: 'border-red-400 bg-red-50',
-  Medium: 'border-yellow-400 bg-yellow-50',
-  Low: 'border-green-400 bg-green-50',
+  High: 'border-red-400 bg-red-50 dark:bg-red-950/40',
+  Medium: 'border-yellow-400 bg-yellow-50 dark:bg-yellow-950/30',
+  Low: 'border-green-400 bg-green-50 dark:bg-green-950/30',
 };
 
 const BADGE_STYLES = {
-  High: 'bg-red-100 text-red-700',
-  Medium: 'bg-yellow-100 text-yellow-700',
-  Low: 'bg-green-100 text-green-700',
+  High: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+  Medium: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
+  Low: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
 };
+
+// Non-color cue so priority is distinguishable without relying on the
+// red/yellow/green alone (colorblind accessibility): more dots = higher.
+const PRIORITY_DOTS = { High: '●●●', Medium: '●●', Low: '●' };
 
 export default function TaskItem({ task, isNew, onToggle, onDelete, onChangeDate }) {
   const [confirming, setConfirming] = useState(false);
@@ -32,18 +36,18 @@ export default function TaskItem({ task, isNew, onToggle, onDelete, onChangeDate
         />
         <div className="flex-1 min-w-0">
           <span
-            className={`block text-sm text-gray-800 ${task.done ? 'line-through text-gray-400' : ''}`}
+            className={`block text-sm text-gray-800 dark:text-gray-100 ${task.done ? 'line-through text-gray-400 dark:text-gray-500' : ''}`}
           >
             {task.title}
           </span>
           {task.description && (
-            <span className={`block text-xs mt-0.5 ${task.done ? 'text-gray-300' : 'text-gray-500'}`}>
+            <span className={`block text-xs mt-0.5 ${task.done ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
               {task.description}
             </span>
           )}
           <label
-            className={`relative inline-flex items-center gap-1 mt-1 text-xs cursor-pointer ${
-              overdue ? 'text-red-600 font-medium' : 'text-gray-500'
+            className={`relative inline-flex items-center gap-1 mt-1 text-xs cursor-pointer underline decoration-dotted underline-offset-2 ${
+              overdue ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-500 dark:text-gray-400'
             }`}
             title="Reschedule this task"
           >
@@ -61,8 +65,11 @@ export default function TaskItem({ task, isNew, onToggle, onDelete, onChangeDate
           </label>
         </div>
         <span
-          className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${BADGE_STYLES[task.priority]}`}
+          className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${BADGE_STYLES[task.priority]}`}
         >
+          <span aria-hidden="true" className="text-[8px] leading-none tracking-tight">
+            {PRIORITY_DOTS[task.priority]}
+          </span>
           {task.priority}
         </span>
         <button

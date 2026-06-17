@@ -99,6 +99,7 @@ export default function App() {
             tasks={filtered}
             totalCount={dayTasks.length}
             filter={filter}
+            hasAnyTasks={tasks.length > 0}
             newestId={newestId}
             onToggle={toggleDone}
             onDelete={deleteTask}
