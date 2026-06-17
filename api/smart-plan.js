@@ -1,7 +1,8 @@
-// Vercel serverless function — keeps the DeepSeek API key server-side only.
+// Vercel serverless function — keeps the OpenAI API key server-side only.
 // The browser calls POST /api/smart-plan with the day's tasks; this function
-// talks to DeepSeek and returns a time-blocked plan + energy-saving tips.
-const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
+// talks to OpenAI and returns a time-blocked plan + energy-saving tips.
+const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const MODEL = 'gpt-5.4-mini';
 
 const SYSTEM_PROMPT = `You are a productivity coach who builds realistic daily plans.
 Given a list of tasks (each with a title, priority, optional description, and whether it's already done), produce:
@@ -17,10 +18,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: 'DEEPSEEK_API_KEY is not configured on the server.',
+      error: 'OPENAI_API_KEY is not configured on the server.',
     });
   }
 
@@ -37,14 +38,14 @@ export default async function handler(req, res) {
   }));
 
   try {
-    const upstream = await fetch(DEEPSEEK_URL, {
+    const upstream = await fetch(OPENAI_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: MODEL,
         temperature: 0.6,
         response_format: { type: 'json_object' },
         messages: [
@@ -57,7 +58,7 @@ export default async function handler(req, res) {
     if (!upstream.ok) {
       const detail = await upstream.text().catch(() => '');
       return res.status(502).json({
-        error: `DeepSeek request failed (${upstream.status}).`,
+        error: `OpenAI request failed (${upstream.status}).`,
         detail: detail.slice(0, 500),
       });
     }
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
     const data = await upstream.json();
     const content = data?.choices?.[0]?.message?.content;
     if (!content) {
-      return res.status(502).json({ error: 'DeepSeek returned an empty response.' });
+      return res.status(502).json({ error: 'OpenAI returned an empty response.' });
     }
 
     let parsed;
@@ -82,6 +83,6 @@ export default async function handler(req, res) {
       tips: Array.isArray(parsed.tips) ? parsed.tips : [],
     });
   } catch (err) {
-    return res.status(502).json({ error: `Could not reach DeepSeek: ${err.message}` });
+    return res.status(502).json({ error: `Could not reach OpenAI: ${err.message}` });
   }
 }

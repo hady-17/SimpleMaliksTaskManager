@@ -22,7 +22,7 @@ https://simple-maliks-task-manager.vercel.app
 - **Delete tasks** with a confirmation dialog
 - **Filter tasks** by All / Pending / Done, with **filter-aware empty states** (e.g. "everything is done!" instead of "add your first task" when all tasks are completed)
 - **Plan My Day** — sorts the *unfinished* tasks by priority (High → Medium → Low) and floats them above completed ones
-- **✨ Smart Plan** — sends the selected day's tasks to DeepSeek (via a serverless function, so the API key never reaches the browser) and returns a time-blocked daily plan plus a few practical tips for saving energy and working smart
+- **✨ Smart Plan** — sends the selected day's tasks to OpenAI (via a serverless function, so the API key never reaches the browser) and returns a time-blocked daily plan plus a few practical tips for saving energy and working smart
 - **Dark mode** toggle with preference saved to localStorage
 - **Persistent storage** — tasks survive page refreshes via localStorage
 - **Maliks branding** — custom favicon
@@ -62,9 +62,9 @@ Then open the URL printed in the terminal — by default [http://localhost:5173]
 
 ### Smart Plan setup (optional)
 
-The "✨ Smart Plan" button calls DeepSeek through a small serverless function (`api/smart-plan.js`) so the API key is never exposed to the browser.
+The "✨ Smart Plan" button calls OpenAI (model: `gpt-5.4-mini`) through a small serverless function (`api/smart-plan.js`) so the API key is never exposed to the browser.
 
-1. Copy `.env.local.example` to `.env.local` and add your key from [platform.deepseek.com](https://platform.deepseek.com):
+1. Copy `.env.local.example` to `.env.local` and add your key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys):
    ```bash
    cp .env.local.example .env.local
    ```
@@ -73,7 +73,7 @@ The "✨ Smart Plan" button calls DeepSeek through a small serverless function (
    npm install -g vercel
    vercel dev
    ```
-3. For the deployed app, add `DEEPSEEK_API_KEY` as an environment variable in the Vercel project settings (not prefixed with `VITE_` — it must stay server-only).
+3. For the deployed app, add `OPENAI_API_KEY` as an environment variable in the Vercel project settings (not prefixed with `VITE_` — it must stay server-only).
 
 ### Production build
 
@@ -129,7 +129,7 @@ src/
 
 - **Voice recognition** relies on the browser Web Speech API (Chrome / Edge / Safari). It is hidden in browsers that don't support it (e.g. Firefox). Arabic dialect accuracy is limited by the browser's engine.
 - **Translation** uses the free MyMemory API (no key required) — good for short task text, rate-limited, and not LLM-grade. Both the recognizer and translator are isolated, so either can be upgraded later without touching the UI.
-- **Smart Plan** requires a DeepSeek API key (see [Smart Plan setup](#smart-plan-setup-optional)) and network access; if the request fails (no key configured, rate limit, etc.) the modal shows the error instead of a generated plan.
+- **Smart Plan** requires an OpenAI API key (see [Smart Plan setup](#smart-plan-setup-optional)) and network access; if the request fails (no key configured, rate limit, etc.) the modal shows the error instead of a generated plan.
 
 ## Scripts
 
