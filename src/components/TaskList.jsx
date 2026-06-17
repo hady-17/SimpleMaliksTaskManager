@@ -17,6 +17,7 @@ export default function TaskList({
   newestId,
   onToggle,
   onDelete,
+  onChangeDate,
 }) {
   if (tasks.length === 0) {
     return <EmptyState message={emptyMessage(totalCount, filter)} />;
@@ -31,6 +32,7 @@ export default function TaskList({
             isNew={task.id === newestId}
             onToggle={onToggle}
             onDelete={onDelete}
+            onChangeDate={onChangeDate}
           />
         </li>
       ))}

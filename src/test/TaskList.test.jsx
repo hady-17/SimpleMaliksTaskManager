@@ -22,7 +22,9 @@ describe('TaskList empty states', () => {
   });
 
   it('renders the tasks when the list is non-empty', () => {
-    const tasks = [{ id: '1', title: 'Write tests', priority: 'High', done: false }];
+    const tasks = [
+      { id: '1', title: 'Write tests', priority: 'High', done: false, date: '2026-06-17' },
+    ];
     render(
       <TaskList tasks={tasks} totalCount={1} filter="All" onToggle={noop} onDelete={noop} />
     );

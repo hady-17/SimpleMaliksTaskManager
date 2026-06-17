@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
+import { formatShort, isOverdue } from '../utils/date';
 
 const PRIORITY_STYLES = {
   High: 'border-red-400 bg-red-50',
@@ -13,8 +14,9 @@ const BADGE_STYLES = {
   Low: 'bg-green-100 text-green-700',
 };
 
-export default function TaskItem({ task, isNew, onToggle, onDelete }) {
+export default function TaskItem({ task, isNew, onToggle, onDelete, onChangeDate }) {
   const [confirming, setConfirming] = useState(false);
+  const overdue = isOverdue(task);
 
   return (
     <>
@@ -39,6 +41,24 @@ export default function TaskItem({ task, isNew, onToggle, onDelete }) {
               {task.description}
             </span>
           )}
+          <label
+            className={`relative inline-flex items-center gap-1 mt-1 text-xs cursor-pointer ${
+              overdue ? 'text-red-600 font-medium' : 'text-gray-500'
+            }`}
+            title="Reschedule this task"
+          >
+            <span aria-hidden="true">📅</span>
+            <span>{formatShort(task.date)}{overdue ? ' · overdue' : ''}</span>
+            {/* Transparent native picker laid over the label so the whole
+                chip is clickable to reschedule the task. */}
+            <input
+              type="date"
+              value={task.date}
+              onChange={(e) => e.target.value && onChangeDate(task.id, e.target.value)}
+              aria-label={`Reschedule "${task.title}"`}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </label>
         </div>
         <span
           className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${BADGE_STYLES[task.priority]}`}

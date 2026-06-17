@@ -3,12 +3,16 @@ import { useTasks } from './hooks/useTasks';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import PlanMyDayButton from './components/PlanMyDayButton';
+import DateNavigator from './components/DateNavigator';
+import { todayStr, isOverdue, formatShort } from './utils/date';
 
 const FILTERS = ['All', 'Pending', 'Done'];
 
 export default function App() {
-  const { tasks, newestId, addTask, toggleDone, deleteTask, sortTasks } = useTasks();
+  const { tasks, newestId, addTask, toggleDone, deleteTask, sortTasks, setTaskDate } =
+    useTasks();
   const [filter, setFilter] = useState('All');
+  const [selectedDate, setSelectedDate] = useState(todayStr());
   const [dark, setDark] = useState(
     () => localStorage.getItem('task-planner-dark') === 'true'
   );
@@ -20,13 +24,24 @@ export default function App() {
     });
   }
 
-  const filtered = tasks.filter((t) => {
+  // Only the selected day's tasks are shown; the status filter narrows within
+  // that day.
+  const dayTasks = tasks.filter((t) => t.date === selectedDate);
+  const filtered = dayTasks.filter((t) => {
     if (filter === 'Pending') return !t.done;
     if (filter === 'Done') return t.done;
     return true;
   });
 
-  const doneCount = tasks.filter((t) => t.done).length;
+  const doneCount = dayTasks.filter((t) => t.done).length;
+
+  // Late tasks: anything still pending whose day is already past. Used for the
+  // footer reminder regardless of which day is being viewed.
+  const overdue = tasks.filter(isOverdue);
+  const oldestOverdue = overdue.reduce(
+    (min, t) => (min && min < t.date ? min : t.date),
+    null
+  );
 
   return (
     <div className={dark ? 'dark' : ''}>
@@ -48,13 +63,16 @@ export default function App() {
 
           {/* Add task */}
           <div className="mb-4">
-            <TaskForm onAdd={addTask} />
+            <TaskForm onAdd={addTask} defaultDate={selectedDate} />
           </div>
+
+          {/* Day picker */}
+          <DateNavigator value={selectedDate} onChange={setSelectedDate} />
 
           {/* Toolbar: counter + filters + Plan My Day */}
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {doneCount} of {tasks.length} tasks done
+              {doneCount} of {dayTasks.length} tasks done
             </span>
             <div className="flex items-center gap-2">
               <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
@@ -79,12 +97,28 @@ export default function App() {
           {/* Task list */}
           <TaskList
             tasks={filtered}
-            totalCount={tasks.length}
+            totalCount={dayTasks.length}
             filter={filter}
             newestId={newestId}
             onToggle={toggleDone}
             onDelete={deleteTask}
+            onChangeDate={setTaskDate}
           />
+
+          {/* Late-task reminder, pinned to the bottom of the page */}
+          {overdue.length > 0 && (
+            <button
+              onClick={() => setSelectedDate(oldestOverdue)}
+              className="w-full mt-6 p-3 rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 text-left transition-colors hover:bg-red-100 dark:hover:bg-red-900/30"
+            >
+              <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                ⚠ {overdue.length} late {overdue.length === 1 ? 'task' : 'tasks'} not done
+              </span>
+              <span className="block text-xs text-red-600 dark:text-red-400 mt-0.5">
+                Oldest from {formatShort(oldestOverdue)} — click to view and reschedule.
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </div>

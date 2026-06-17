@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { todayStr, toDateStr } from '../utils/date';
 
 const STORAGE_KEY = 'task-planner-tasks';
 
@@ -15,7 +16,13 @@ function createId() {
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const tasks = raw ? JSON.parse(raw) : [];
+    // Migrate tasks saved before scheduling existed: anchor them to the day
+    // they were created on, falling back to today.
+    return tasks.map((t) => ({
+      ...t,
+      date: t.date || (t.createdAt ? toDateStr(new Date(t.createdAt)) : todayStr()),
+    }));
   } catch {
     return [];
   }
@@ -32,17 +39,25 @@ export function useTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks]);
 
-  function addTask(title, priority, description = '') {
+  function addTask(title, priority, description = '', date = todayStr()) {
     const newTask = {
       id: createId(),
       title: title.trim(),
       description: description.trim(),
       priority,
+      date,
       done: false,
       createdAt: Date.now(),
     };
     setNewestId(newTask.id);
     setTasks((prev) => [newTask, ...prev]);
+  }
+
+  // Reschedule a task to a different day.
+  function setTaskDate(id, date) {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, date } : t))
+    );
   }
 
   function toggleDone(id) {
@@ -68,5 +83,5 @@ export function useTasks() {
     });
   }
 
-  return { tasks, newestId, addTask, toggleDone, deleteTask, sortTasks };
+  return { tasks, newestId, addTask, toggleDone, deleteTask, sortTasks, setTaskDate };
 }
