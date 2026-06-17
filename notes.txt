@@ -11,8 +11,7 @@ The component structure, hook logic, and Tailwind class choices were written wit
 
 ## One thing to improve with more time
 
-Add drag-and-drop reordering so users can manually arrange tasks within the same priority tier. Currently "Plan My Day" sorts by priority but gives no control over order within High/Medium/Low groups. A library like @dnd-kit/core would handle this cleanly without heavy custom pointer logic.
-
+I will build a well structured backend to support it (auth system , well structured APIs)
 ## Plan My Day — implementation note
 
 "Plan My Day" uses a pure JS sort (High → Medium → Low). No external API or AI dependency — simple, reliable, and instant. An API-based version was considered but ruled out: the value add is low for a single-day planner and would introduce network failure modes.
