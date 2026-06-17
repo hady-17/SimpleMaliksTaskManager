@@ -23,6 +23,7 @@ https://simple-maliks-task-manager.vercel.app
 - **Filter tasks** by All / Pending / Done, with **filter-aware empty states** (e.g. "everything is done!" instead of "add your first task" when all tasks are completed)
 - **Plan My Day** — sorts the *unfinished* tasks by priority (High → Medium → Low) and floats them above completed ones
 - **✨ Smart Plan** — sends the selected day's tasks to OpenAI (via a serverless function, so the API key never reaches the browser) and returns a time-blocked daily plan plus a few practical tips for saving energy and working smart
+  - **Save as Word** — downloads the generated plan and tips as a `.docx` file
 - **Dark mode** toggle with preference saved to localStorage
 - **Persistent storage** — tasks survive page refreshes via localStorage
 - **Maliks branding** — custom favicon
@@ -84,7 +85,7 @@ npm run preview  # serve the built app locally
 
 ## Testing
 
-Unit tests cover the core logic (priority sorting, task state, translation, and empty states).
+Unit tests cover the core logic (priority sorting, task state, translation, empty states, and the Smart Plan request/export/modal flow).
 
 ```bash
 npm test          # run the suite once
@@ -95,7 +96,7 @@ npm run test:watch # re-run on change
 
 ```
 api/
-└── smart-plan.js              # Vercel serverless function — calls DeepSeek server-side
+└── smart-plan.js              # Vercel serverless function — calls OpenAI server-side
 
 src/
 ├── components/
@@ -115,12 +116,14 @@ src/
 │   ├── sortByPriority.js     # Priority sort helper
 │   ├── date.js               # Local-safe date helpers (today, add days, formatting, overdue check)
 │   ├── translateToEnglish.js # Arabic → English translation (MyMemory API)
-│   └── generateSmartPlan.js  # Calls /api/smart-plan and shapes the response for the UI
+│   ├── generateSmartPlan.js  # Calls /api/smart-plan and shapes the response for the UI
+│   └── exportSmartPlanToDocx.js # Builds and downloads the plan as a .docx file
 ├── test/
 │   ├── setup.js              # jest-dom matchers
 │   ├── sortByPriority.test.js
 │   ├── translateToEnglish.test.js
 │   ├── useTasks.test.js
+│   ├── generateSmartPlan.test.js
 │   └── TaskList.test.jsx
 └── App.jsx                   # Root layout, filter + selected-day state, dark mode, overdue footer
 ```

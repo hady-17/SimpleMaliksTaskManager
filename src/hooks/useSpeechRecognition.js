@@ -16,7 +16,13 @@ export function useSpeechRecognition({ onResult, lang = 'en-US' } = {}) {
   const [interim, setInterim] = useState('');
   const recognitionRef = useRef(null);
   const onResultRef = useRef(onResult);
-  onResultRef.current = onResult;
+
+  // Keep the ref pointing at the latest onResult without re-running the main
+  // effect below (which would otherwise tear down and recreate the
+  // recognition session whenever the caller passes a fresh inline callback).
+  useEffect(() => {
+    onResultRef.current = onResult;
+  }, [onResult]);
 
   useEffect(() => {
     if (!supported) return;

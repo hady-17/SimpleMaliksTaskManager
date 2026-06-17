@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { translateToEnglish } from '../utils/translateToEnglish';
 import { todayStr } from '../utils/date';
@@ -8,14 +8,18 @@ export default function TaskForm({ onAdd, defaultDate = todayStr() }) {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [date, setDate] = useState(defaultDate);
+  const [prevDefaultDate, setPrevDefaultDate] = useState(defaultDate);
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState('en-US');
 
   // Follow the day the user is viewing: a new task defaults to that date
-  // (they can still override it per task before adding).
-  useEffect(() => {
+  // (they can still override it per task before adding). Adjusted during
+  // render rather than in an effect — see
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  if (defaultDate !== prevDefaultDate) {
+    setPrevDefaultDate(defaultDate);
     setDate(defaultDate);
-  }, [defaultDate]);
+  }
 
   const { supported, listening, interim, start, stop } = useSpeechRecognition({
     lang,

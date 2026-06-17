@@ -1,4 +1,22 @@
-export default function SmartPlanModal({ loading, error, data, onClose, onRetry }) {
+import { useState } from 'react';
+import { exportSmartPlanToDocx } from '../utils/exportSmartPlanToDocx';
+
+export default function SmartPlanModal({ loading, error, data, date, onClose, onRetry }) {
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(null);
+
+  async function handleExport() {
+    setExporting(true);
+    setExportError(null);
+    try {
+      await exportSmartPlanToDocx(data, date);
+    } catch (err) {
+      setExportError(err.message);
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto p-6 flex flex-col gap-4">
@@ -99,7 +117,20 @@ export default function SmartPlanModal({ loading, error, data, onClose, onRetry 
               </>
             )}
 
-            <div className="flex justify-end">
+            {exportError && (
+              <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                Couldn't save the file: {exportError}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleExport}
+                disabled={exporting}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-purple-600 dark:text-purple-300 border border-purple-300 dark:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {exporting ? 'Saving...' : '💾 Save as Word'}
+              </button>
               <button
                 onClick={onClose}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 transition-colors"

@@ -143,6 +143,7 @@ export default function App() {
           loading={smartPlan.loading}
           error={smartPlan.error}
           data={smartPlan.data}
+          date={selectedDate}
           onClose={() => setSmartPlan(null)}
           onRetry={handleSmartPlan}
         />
