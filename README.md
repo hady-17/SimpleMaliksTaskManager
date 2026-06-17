@@ -22,6 +22,7 @@ https://simple-maliks-task-manager.vercel.app
 - **Delete tasks** with a confirmation dialog
 - **Filter tasks** by All / Pending / Done, with **filter-aware empty states** (e.g. "everything is done!" instead of "add your first task" when all tasks are completed)
 - **Plan My Day** — sorts the *unfinished* tasks by priority (High → Medium → Low) and floats them above completed ones
+- **✨ Smart Plan** — sends the selected day's tasks to DeepSeek (via a serverless function, so the API key never reaches the browser) and returns a time-blocked daily plan plus a few practical tips for saving energy and working smart
 - **Dark mode** toggle with preference saved to localStorage
 - **Persistent storage** — tasks survive page refreshes via localStorage
 - **Maliks branding** — custom favicon
@@ -57,7 +58,22 @@ npm run dev
 
 Then open the URL printed in the terminal — by default [http://localhost:5173](http://localhost:5173) — in your browser.
 
-> If the repository was cloned into a different folder name, `cd` into that folder instead. The app runs entirely in the browser with no backend or environment variables to configure.
+> If the repository was cloned into a different folder name, `cd` into that folder instead. Everything except the **Smart Plan** feature runs entirely in the browser with no backend or environment variables to configure.
+
+### Smart Plan setup (optional)
+
+The "✨ Smart Plan" button calls DeepSeek through a small serverless function (`api/smart-plan.js`) so the API key is never exposed to the browser.
+
+1. Copy `.env.local.example` to `.env.local` and add your key from [platform.deepseek.com](https://platform.deepseek.com):
+   ```bash
+   cp .env.local.example .env.local
+   ```
+2. `npm run dev` (plain Vite) does **not** serve `/api` routes. To test Smart Plan locally, run it through the [Vercel CLI](https://vercel.com/docs/cli) instead, which serves the app and the serverless function together:
+   ```bash
+   npm install -g vercel
+   vercel dev
+   ```
+3. For the deployed app, add `DEEPSEEK_API_KEY` as an environment variable in the Vercel project settings (not prefixed with `VITE_` — it must stay server-only).
 
 ### Production build
 
@@ -78,6 +94,9 @@ npm run test:watch # re-run on change
 ## Project Structure
 
 ```
+api/
+└── smart-plan.js              # Vercel serverless function — calls DeepSeek server-side
+
 src/
 ├── components/
 │   ├── TaskForm.jsx          # Add-task input, date, priority, description toggle, voice input
@@ -85,6 +104,8 @@ src/
 │   ├── TaskItem.jsx          # Individual task row with toggle/delete, description, reschedule
 │   ├── DateNavigator.jsx     # Day picker: prev/next day, jump-to-date, "Today"
 │   ├── PlanMyDayButton.jsx   # Triggers the priority sort
+│   ├── SmartPlanButton.jsx   # Triggers the DeepSeek-generated plan
+│   ├── SmartPlanModal.jsx    # Shows the generated plan + tips (loading/error states)
 │   ├── ConfirmDialog.jsx     # Delete confirmation modal
 │   └── EmptyState.jsx        # Empty-state message (filter-aware)
 ├── hooks/
@@ -93,7 +114,8 @@ src/
 ├── utils/
 │   ├── sortByPriority.js     # Priority sort helper
 │   ├── date.js               # Local-safe date helpers (today, add days, formatting, overdue check)
-│   └── translateToEnglish.js # Arabic → English translation (MyMemory API)
+│   ├── translateToEnglish.js # Arabic → English translation (MyMemory API)
+│   └── generateSmartPlan.js  # Calls /api/smart-plan and shapes the response for the UI
 ├── test/
 │   ├── setup.js              # jest-dom matchers
 │   ├── sortByPriority.test.js
@@ -107,6 +129,7 @@ src/
 
 - **Voice recognition** relies on the browser Web Speech API (Chrome / Edge / Safari). It is hidden in browsers that don't support it (e.g. Firefox). Arabic dialect accuracy is limited by the browser's engine.
 - **Translation** uses the free MyMemory API (no key required) — good for short task text, rate-limited, and not LLM-grade. Both the recognizer and translator are isolated, so either can be upgraded later without touching the UI.
+- **Smart Plan** requires a DeepSeek API key (see [Smart Plan setup](#smart-plan-setup-optional)) and network access; if the request fails (no key configured, rate limit, etc.) the modal shows the error instead of a generated plan.
 
 ## Scripts
 

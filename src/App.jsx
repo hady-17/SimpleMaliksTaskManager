@@ -3,8 +3,11 @@ import { useTasks } from './hooks/useTasks';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import PlanMyDayButton from './components/PlanMyDayButton';
+import SmartPlanButton from './components/SmartPlanButton';
+import SmartPlanModal from './components/SmartPlanModal';
 import DateNavigator from './components/DateNavigator';
 import { todayStr, isOverdue, formatShort } from './utils/date';
+import { generateSmartPlan } from './utils/generateSmartPlan';
 
 const FILTERS = ['All', 'Pending', 'Done'];
 
@@ -16,6 +19,17 @@ export default function App() {
   const [dark, setDark] = useState(
     () => localStorage.getItem('task-planner-dark') === 'true'
   );
+  const [smartPlan, setSmartPlan] = useState(null); // { loading, error, data } | null
+
+  async function handleSmartPlan() {
+    setSmartPlan({ loading: true, error: null, data: null });
+    try {
+      const data = await generateSmartPlan(dayTasks);
+      setSmartPlan({ loading: false, error: null, data });
+    } catch (err) {
+      setSmartPlan({ loading: false, error: err.message, data: null });
+    }
+  }
 
   function toggleDark() {
     setDark((d) => {
@@ -91,6 +105,7 @@ export default function App() {
                 ))}
               </div>
               <PlanMyDayButton onClick={sortTasks} />
+              <SmartPlanButton onClick={handleSmartPlan} disabled={dayTasks.length === 0} />
             </div>
           </div>
 
@@ -122,6 +137,16 @@ export default function App() {
           )}
         </div>
       </div>
+
+      {smartPlan && (
+        <SmartPlanModal
+          loading={smartPlan.loading}
+          error={smartPlan.error}
+          data={smartPlan.data}
+          onClose={() => setSmartPlan(null)}
+          onRetry={handleSmartPlan}
+        />
+      )}
     </div>
   );
 }
