@@ -43,7 +43,7 @@ https://simple-maliks-task-manager.vercel.app
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/hady-17/SimpleMaliksTaskManager
 
 # 2. Enter the project folder
 cd task-planner
@@ -119,6 +119,3 @@ src/
 | `npm test` | Run unit tests once |
 | `npm run test:watch` | Run unit tests in watch mode |
 
-
-## Deployment link 
-  https://simple-maliks-task-manager.vercel.app/
